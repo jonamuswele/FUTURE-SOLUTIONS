@@ -1072,8 +1072,8 @@ function CropsTab({ nodes }) {
   const daysSince = ds => { if(!ds)return null; const d=(Date.now()-new Date(ds))/86400000; return d>0?Math.floor(d):null; };
   const save = id => { setSaved(p=>({...p,[id]:true})); setTimeout(()=>setSaved(p=>({...p,[id]:false})),2000); };
 
-  const cropOptions = ["Maize","Wheat","Rice","Tomato","Cassava","Yam","Pepper","Cowpea",
-    "Groundnut","Sorghum","Millet","Soybean","Okra","Spinach","Cabbage","Onion","Garlic","Other"];
+  const cropOptions = ["Maize","Wheat","Rice","Tomato","Cassava","Yam","Pepper",
+    "Groundnut","Sorghum","Soybean","Okra","Spinach","Cabbage","Onion","Garlic","Other"];
 
   return (
     <div>
