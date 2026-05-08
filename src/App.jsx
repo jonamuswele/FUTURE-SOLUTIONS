@@ -784,6 +784,218 @@ const css = `
     .nav-bar  { padding: 0 16px; overflow-x: auto; }
     .app-header { padding: 0 16px; }
   }
+  /* ── TABLE STYLES ── */
+  .data-table-container {
+    margin-top: 32px;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+  
+  .node-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 700px;
+  }
+  
+  .node-data-table th {
+    text-align: left;
+    padding: 16px 16px;
+    background: var(--bg);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  .node-data-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--divider);
+    color: var(--text);
+  }
+  
+  .node-data-table tr:hover {
+    background: var(--bg);
+    transition: background 0.2s;
+  }
+  
+  .node-data-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .alert-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .alert-badge.active {
+    background: var(--red-pale);
+    color: var(--red);
+  }
+  
+  .alert-badge.inactive {
+    background: var(--green-pale);
+    color: var(--green-dark);
+  }
+  
+  .action-button {
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .action-button:hover {
+    background: var(--blue-dark);
+    transform: translateY(-1px);
+  }
+  
+  .action-button:active {
+    transform: translateY(0);
+  }
+  
+  .sensor-value {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+  }
+  
+  .sensor-value.high {
+    color: var(--red);
+  }
+  
+  .sensor-value.warning {
+    color: #9a7a00;
+  }
+  
+  .sensor-value.normal {
+    color: var(--green);
+  }
+  
+  .table-header-icon {
+    margin-right: 6px;
+    font-size: 14px;
+  }
+  /* ── CROP GROWTH STYLES ── */
+  .growth-stage-card {
+    background: var(--blue-pale);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+    border-left: 4px solid var(--blue);
+  }
+  
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .stage-icon {
+    font-size: 20px;
+  }
+  
+  .stage-name {
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--blue-dark);
+  }
+  
+  .progress-bar-container {
+    background: var(--border);
+    border-radius: 10px;
+    height: 8px;
+    margin: 10px 0;
+    overflow: hidden;
+  }
+  
+  .progress-bar-fill {
+    background: var(--green);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+  }
+  
+  .crop-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  
+  .metric-chip {
+    background: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  
+  .observation-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 8px;
+  }
+  
+  .observation-list li {
+    font-size: 11px;
+    padding: 4px 0;
+    color: var(--muted);
+  }
+  
+  .observation-list li:before {
+    content: "🔍 ";
+    margin-right: 4px;
+  }
+  
+  .recommendation-tag {
+    background: rgba(26,156,62,0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin: 2px 0;
+    display: inline-block;
+    margin-right: 4px;
+  }
+  
+  .harvest-countdown {
+    background: var(--yellow-pale);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    margin-top: 12px;
+  }
+  
+  .harvest-countdown.urgent {
+    background: var(--red-pale);
+    color: var(--red);
+  }
+  
+  .add-node-section {
+    margin-top: 32px;
+    padding: 24px;
+    background: var(--green-pale);
+    border-radius: 12px;
+    border: 2px dashed var(--green-mid);
+  }
 `;
 
 // ── Tooltip ───────────────────────────────────────────────────────────────
@@ -830,6 +1042,47 @@ const BrandLogo = () => (
   </div>
 );
 
+const getNodeAlertInfo = (node) => {
+  const humidity = node.sensor_json?.humidity || 0;
+  const temp = node.sensor_json?.temp || 0; 
+  const ec = node.sensor_json?.ec || 0;
+
+  let alertActive = false;
+  let action ="Monitor";
+  let alertType = "normal";
+
+  if (!node.active){
+    alertActive = true;
+    action = "check device";
+    alertType = "offline";
+  }else if (humidity < 25){
+    alertActive = true;
+    action = "Irrigate immediately";
+    alertType = "critical";
+  }else if (humidity < MOISTURE_THRESHOLD){
+    alertActive = true;
+    action = "Schedule irrigation";
+    alertType = "warning";
+  }else if (humidity > 80){
+    alertActive = true;
+    action = "Improve drainage";
+    alertType = "caution";
+  } else if (ec > 3.0) {
+    alertActive = true;
+    action = "Flush soil";
+    alertType = "warning";
+  } else if (ec < 0.8) {
+    alertActive = true;
+    action = "Apply fertilizer";
+    alertType = "info";
+  } else if (temp > 35) {
+    alertActive = true;
+    action = "Apply mulch";
+    alertType = "caution";
+  }
+  return {alertActive, action, alertType};
+}
+
 // ── TAB 1: Dashboard ──────────────────────────────────────────────────────
 function DashboardTab({ nodes, history }) {
   const [metric, setMetric] = useState("humidity");
@@ -856,6 +1109,125 @@ function DashboardTab({ nodes, history }) {
   });
 
   const tickFmt = (_,i) => i%6===0 ? _ : "";
+
+  const NodeDataTable = ({nodes}) => {
+    const [actionMessage, setActionMessage] = useState(null);
+    
+    const handleActionClick = (nodeId, action) => {
+      setActionMessage(`✅ Action logged for ${nodeId}: ${action}`);
+      setTimeout(() => setActionMessage(null), 3000);
+    };
+    return (
+      <div className="data-table-container">
+        {actionMessage && (
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            background: 'var(--green-dark)',
+            color: 'white',
+            padding: '12px 20px',
+            borderRadius: '8px',
+            fontSize: '13px',
+            fontWeight: '600',
+            zIndex: 1000,
+            animation: 'slideIn 0.3s ease'
+          }}>
+            {actionMessage}
+          </div>
+        )}
+        
+        <table className="node-data-table">
+          <thead>
+            <tr>
+              <th><span className="table-header-icon">🔌</span> Node ID</th>
+              <th><span className="table-header-icon">💧</span> Humidity (%)</th>
+              <th><span className="table-header-icon">🌡️</span> Temperature (°C)</th>
+              <th><span className="table-header-icon">⚡</span> EC (mS/cm)</th>
+              <th><span className="table-header-icon">⚠️</span> Alert Status</th>
+              <th><span className="table-header-icon">🎯</span> Action to Take</th>
+            </tr>
+          </thead>
+          <tbody>
+            {nodes.map(node => {
+              const humidity = node.sensor_json?.humidity || 0;
+              const temp = node.sensor_json?.temp_c || 0;
+              const ec = node.sensor_json?.ec || 0;
+              const { alertActive, action, alertType } = getNodeAlertInfo(node);
+              
+              // Determine CSS class for humidity value coloring
+              const getHumidityClass = () => {
+                if (humidity < 25) return "high";
+                if (humidity < MOISTURE_THRESHOLD) return "warning";
+                return "normal";
+              };
+              
+              // Determine CSS class for temperature
+              const getTempClass = () => {
+                if (temp > 35) return "high";
+                if (temp < 10) return "warning";
+                return "normal";
+              };
+              
+              // Determine CSS class for EC
+              const getECClass = () => {
+                if (ec > 3.0) return "high";
+                if (ec < 0.8) return "warning";
+                return "normal";
+              };
+              
+              return (
+                <tr key={node.node_id}>
+                  <td style={{ fontWeight: '700' }}>
+                    {node.node_id}
+                    {!node.active && <span style={{ marginLeft: '8px', fontSize: '10px', color: 'var(--red)' }}>●</span>}
+                  </td>
+                  <td>
+                    <span className={`sensor-value ${getHumidityClass()}`}>
+                      {humidity.toFixed(1)}%
+                    </span>
+                    {humidity < MOISTURE_THRESHOLD && (
+                      <span style={{ marginLeft: '8px', fontSize: '10px' }}>⚠️</span>
+                    )}
+                  </td>
+                  <td>
+                    <span className={`sensor-value ${getTempClass()}`}>
+                      {temp.toFixed(1)}°C
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`sensor-value ${getECClass()}`}>
+                      {ec.toFixed(2)}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={`alert-badge ${alertActive ? 'active' : 'inactive'}`}>
+                      {alertActive ? '🔴 ACTIVE' : '🟢 NORMAL'}
+                    </div>
+                    {alertActive && (
+                      <div style={{ fontSize: '10px', marginTop: '4px', color: 'var(--muted)' }}>
+                        {alertType === 'critical' && 'Urgent action needed'}
+                        {alertType === 'warning' && 'Attention required'}
+                        {alertType === 'offline' && 'Device offline'}
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <button 
+                      className="action-button"
+                      onClick={() => handleActionClick(node.node_id, action)}
+                    >
+                      {action}
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -954,6 +1326,14 @@ function DashboardTab({ nodes, history }) {
             ))}
           </LineChart>
         </ResponsiveContainer>
+      </div>
+      {/* NODE DATA TABLE */}
+      <div style={{ marginTop: '32px' }}>
+        <div className="section-heading">Node Status Overview</div>
+        <div className="section-desc">
+          Comprehensive view of all sensor nodes with real-time alerts and recommended actions
+        </div>
+        <NodeDataTable nodes={nodes} />
       </div>
     </div>
   );
@@ -1061,57 +1441,694 @@ function HistoryTab({ nodes, history }) {
   );
 }
 
+const CROP_GROWTH_DATA = {
+  "Maize": {
+    maturityDays: 90,
+    growthStages: [
+      { name: "Germination", daysRange: [0, 10], description: "Seed sprouting", icon: "🌱", actions: ["Keep soil moist", "Avoid waterlogging"] },
+      { name: "Seedling", daysRange: [11, 25], description: "Early leaf development", icon: "🌿", actions: ["Apply starter fertilizer", "Control weeds"] },
+      { name: "Vegetative", daysRange: [26, 55], description: "Rapid growth, stalk development", icon: "🌾", actions: ["Side-dress nitrogen", "Monitor pests"] },
+      { name: "Tasseling/Silking", daysRange: [56, 70], description: "Reproductive stage", icon: "🌽", actions: ["Ensure adequate water", "Watch for corn borers"] },
+      { name: "Grain Fill", daysRange: [71, 85], description: "Kernel development", icon: "🍿", actions: ["Protect from birds", "Monitor moisture"] },
+      { name: "Maturity", daysRange: [86, 90], description: "Ready for harvest", icon: "🚜", actions: ["Check kernel moisture", "Prepare harvest equipment"] }
+    ]
+  },
+  "Wheat": {
+    maturityDays: 120,
+    growthStages: [
+      { name: "Germination", daysRange: [0, 10], icon: "🌱", description: "Seed sprouting", actions: ["Even moisture", "Check emergence"] },
+      { name: "Tillering", daysRange: [11, 40], icon: "🌿", description: "Shoot formation", actions: ["Apply nitrogen", "Control weeds"] },
+      { name: "Stem Extension", daysRange: [41, 65], icon: "📏", description: "Stem elongation", actions: ["Monitor for rust", "Irrigate if dry"] },
+      { name: "Heading", daysRange: [66, 85], icon: "🌾", description: "Head emergence", actions: ["Protect from frost", "Fungicide if needed"] },
+      { name: "Flowering", daysRange: [86, 100], icon: "🌸", description: "Pollination", actions: ["Avoid water stress", "Monitor for aphids"] },
+      { name: "Ripening", daysRange: [101, 120], icon: "🌾", description: "Grain drying", actions: ["Reduce water", "Prepare for harvest"] }
+    ]
+  },
+  "Rice": {
+    maturityDays: 140,
+    growthStages: [
+      { name: "Nursery", daysRange: [0, 21], icon: "🌱", description: "Seedling preparation", actions: ["Maintain water depth", "Fertilize lightly"] },
+      { name: "Transplanting", daysRange: [22, 30], icon: "👩‍🌾", description: "Moving to field", actions: ["Puddle soil", "Spacing 20x20cm"] },
+      { name: "Tillering", daysRange: [31, 60], icon: "🌿", description: "Culm development", actions: ["Maintain 5cm water", "Apply nitrogen"] },
+      { name: "Panicle Initiation", daysRange: [61, 85], icon: "🍚", description: "Grain formation start", actions: ["Deep water to 10cm", "Monitor stem borers"] },
+      { name: "Flowering", daysRange: [86, 105], icon: "🌸", description: "Pollination", actions: ["Shallow water 2-5cm", "Avoid stress"] },
+      { name: "Grain Filling", daysRange: [106, 130], icon: "🌾", description: "Rice development", actions: ["Alternate wet/dry", "Control birds"] },
+      { name: "Maturity", daysRange: [131, 140], icon: "🚜", description: "Ready for harvest", actions: ["Drain field", "Harvest at 20-25% moisture"] }
+    ]
+  },
+  "Tomato": {
+    maturityDays: 75,
+    growthStages: [
+      { name: "Germination", daysRange: [0, 8], icon: "🌱", description: "Seed sprouting", actions: ["Warm soil 25°C", "High humidity"] },
+      { name: "Seedling", daysRange: [9, 25], icon: "🌿", description: "True leaves develop", actions: ["Transplant after 6 leaves", "Support stems"] },
+      { name: "Vegetative", daysRange: [26, 40], icon: "🍃", description: "Vine growth", actions: ["Stake plants", "Prune suckers"] },
+      { name: "Flowering", daysRange: [41, 55], icon: "🌼", description: "Yellow flowers appear", actions: ["Pollination help", "Calcium spray"] },
+      { name: "Fruit Set", daysRange: [56, 65], icon: "🍅", description: "Green fruit development", actions: ["Consistent watering", "Watch for blossom end rot"] },
+      { name: "Ripening", daysRange: [66, 75], icon: "🍅", description: "Fruit color change", actions: ["Reduce water", "Harvest when red"] }
+    ]
+  },
+  "Cassava": {
+    maturityDays: 300,
+    growthStages: [
+      { name: "Establishment", daysRange: [0, 60], icon: "🌱", description: "Root and stem development", actions: ["Control weeds", "Fertilize with K"] },
+      { name: "Canopy Development", daysRange: [61, 120], icon: "🌿", description: "Leaf area expansion", actions: ["Mulch to retain moisture", "Monitor mites"] },
+      { name: "Tuber Initiation", daysRange: [121, 180], icon: "🥔", description: "Storage roots start", actions: ["Phosphorus application", "Hill up soil"] },
+      { name: "Tuber Bulking", daysRange: [181, 240], icon: "📈", description: "Root enlargement", actions: ["Avoid water stress", "Potassium crucial"] },
+      { name: "Maturation", daysRange: [241, 300], icon: "🌾", description: "Starch accumulation", actions: ["Stop fertilizer", "Harvest when leaves yellow"] }
+    ]
+  }
+};
+
+// Default growth stages for other crops
+const DEFAULT_GROWTH_STAGES = [
+  { name: "Establishment", daysRange: [0, 30], icon: "🌱", description: "Early growth", actions: ["Regular watering", "Monitor emergence"] },
+  { name: "Vegetative", daysRange: [31, 60], icon: "🌿", description: "Leaf/Stem growth", actions: ["Fertilize", "Control pests"] },
+  { name: "Reproductive", daysRange: [61, 90], icon: "🌸", description: "Flowering/Fruiting", actions: ["Pollination support", "Monitor diseases"] },
+  { name: "Maturation", daysRange: [91, 120], icon: "🌾", description: "Harvest ready", actions: ["Reduce water", "Prepare harvest"] }
+];
+
+const analyzeCropGrowth = (cropName, plantingDate, nodeHumidity, nodeTemp) => {
+  if (!cropName || !plantingDate) return null;
+  
+  const planting = new Date(plantingDate);
+  const today = new Date();
+  const daysSincePlanting = Math.floor((today - planting) / (1000 * 60 * 60 * 24));
+  
+  // Get crop-specific growth data or use default
+  const growthData = CROP_GROWTH_DATA[cropName] || {
+    maturityDays: 120,
+    growthStages: DEFAULT_GROWTH_STAGES
+  };
+  
+  // Determine current growth stage
+  let currentStage = null;
+  let nextStage = null;
+  
+  for (let i = 0; i < growthData.growthStages.length; i++) {
+    const stage = growthData.growthStages[i];
+    const [start, end] = stage.daysRange;
+    
+    if (daysSincePlanting >= start && daysSincePlanting <= end) {
+      currentStage = stage;
+      // Get next stage if exists
+      if (i + 1 < growthData.growthStages.length) {
+        nextStage = growthData.growthStages[i + 1];
+      }
+      break;
+    }
+  }
+  
+  // If no stage found (beyond maturity)
+  if (!currentStage && daysSincePlanting > growthData.maturityDays) {
+    currentStage = {
+      name: "Overdue Harvest",
+      icon: "⚠️",
+      description: "Past expected harvest date",
+      actions: ["Harvest immediately", "Check quality"]
+    };
+  }
+  
+  // Calculate progress percentage
+  const progressPercent = Math.min(100, Math.floor((daysSincePlanting / growthData.maturityDays) * 100));
+  
+  // Expected harvest date
+  const harvestDate = new Date(planting);
+  harvestDate.setDate(harvestDate.getDate() + growthData.maturityDays);
+  
+  // Days until harvest
+  const daysUntilHarvest = Math.max(0, Math.floor((harvestDate - today) / (1000 * 60 * 60 * 24)));
+  
+  // Environmental recommendations based on sensor data
+  const envRecommendations = [];
+  if (nodeHumidity < 40) envRecommendations.push("Low soil moisture - increase irrigation");
+  if (nodeHumidity > 80) envRecommendations.push("High soil moisture - improve drainage");
+  if (nodeTemp > 32) envRecommendations.push("High temperature - consider shade or mulch");
+  if (nodeTemp < 15) envRecommendations.push("Low temperature - protect from cold");
+  
+  // Stage-specific goals (what you should be seeing)
+  const expectedObservations = [];
+  if (currentStage) {
+    if (currentStage.name === "Flowering" || currentStage.name.includes("Flower")) {
+      expectedObservations.push("Should see yellow/white flowers developing");
+    }
+    if (currentStage.name === "Fruit Set" || currentStage.name.includes("Fruit")) {
+      expectedObservations.push("Small fruits should be visible on plants");
+    }
+    if (currentStage.name === "Vegetative" || currentStage.name === "Tillering") {
+      expectedObservations.push("Rapid leaf and stem growth expected");
+    }
+    if (currentStage.name === "Grain Fill" || currentStage.name === "Tuber Bulking") {
+      expectedObservations.push("Grains/tubers should be swelling");
+    }
+  }
+  
+  return {
+    daysSincePlanting,
+    daysUntilHarvest,
+    progressPercent,
+    currentStage,
+    nextStage,
+    harvestDate,
+    maturityDays: growthData.maturityDays,
+    isOverdue: daysSincePlanting > growthData.maturityDays,
+    envRecommendations,
+    expectedObservations,
+    health: progressPercent < 25 ? "🌱 Just planted" :
+            progressPercent < 50 ? "🌿 Growing well" :
+            progressPercent < 75 ? "🌾 Developing" :
+            progressPercent < 100 ? "🍂 Maturing" : "⚠️ Ready for harvest"
+  };
+};
+
+const PREPOPULATED_CROPS = {
+  "NODE_01": {
+    crop: "Maize",
+    planted: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() - 45); // Planted 45 days ago
+      return date.toISOString().split('T')[0];
+    })(),
+    notes: "North field, high-yield variety, drip irrigation installed"
+  },
+  "NODE_02": {
+    crop: "Tomato",
+    planted: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() - 32); // Planted 32 days ago
+      return date.toISOString().split('T')[0];
+    })(),
+    notes: "Greenhouse section A, trellised, organic fertilizer"
+  },
+  "NODE_03": {
+    crop: "Cassava",
+    planted: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() - 120); // Planted 120 days ago
+      return date.toISOString().split('T')[0];
+    })(),
+    notes: "South slope, drought-resistant variety, intercropped with beans"
+  },
+  "NODE_04": {
+    crop: "Rice",
+    planted: (() => {
+      const date = new Date();
+      date.setDate(date.getDate() - 65); // Planted 65 days ago
+      return date.toISOString().split('T')[0];
+    })(),
+    notes: "Paddy field B, water depth maintained at 5cm"
+  }
+};
+
 // ── TAB 3: Crops ──────────────────────────────────────────────────────────
 function CropsTab({ nodes }) {
-  const [crops, setCrops] = useState(() =>
-    Object.fromEntries(nodes.map(n => [n.node_id, { crop:"", planted:"", notes:"" }]))
-  );
-  const [saved, setSaved] = useState({});
+  // State for managing crops data (prepopulated + custom)
+  const [customCrops, setCustomCrops] = useState({});
+  const [showAddNode, setShowAddNode] = useState(false);
+  const [newNode, setNewNode] = useState({ 
+    id: "", 
+    mac: "", 
+    crop: "", 
+    planted: "", 
+    notes: "" 
+  });
 
-  const update = (id,f,v) => setCrops(p=>({...p,[id]:{...p[id],[f]:v}}));
-  const daysSince = ds => { if(!ds)return null; const d=(Date.now()-new Date(ds))/86400000; return d>0?Math.floor(d):null; };
-  const save = id => { setSaved(p=>({...p,[id]:true})); setTimeout(()=>setSaved(p=>({...p,[id]:false})),2000); };
+  // Pre-populated crop data for existing nodes
+  const PREPOPULATED_CROPS = {
+    "NODE_01": {
+      crop: "Maize",
+      planted: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 45);
+        return date.toISOString().split('T')[0];
+      })(),
+      notes: "North field, high-yield variety, drip irrigation installed"
+    },
+    "NODE_02": {
+      crop: "Tomato",
+      planted: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 32);
+        return date.toISOString().split('T')[0];
+      })(),
+      notes: "Greenhouse section A, trellised, organic fertilizer"
+    },
+    "NODE_03": {
+      crop: "Cassava",
+      planted: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 120);
+        return date.toISOString().split('T')[0];
+      })(),
+      notes: "South slope, drought-resistant variety, intercropped with beans"
+    },
+    "NODE_04": {
+      crop: "Rice",
+      planted: (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 65);
+        return date.toISOString().split('T')[0];
+      })(),
+      notes: "Paddy field B, water depth maintained at 5cm"
+    }
+  };
 
-  const cropOptions = ["Maize","Wheat","Rice","Tomato","Cassava","Yam","Pepper",
-    "Groundnut","Sorghum","Soybean","Okra","Spinach","Cabbage","Onion","Garlic","Other"];
+  // Combine prepopulated and custom crops
+  const getAllCropData = () => {
+    return { ...PREPOPULATED_CROPS, ...customCrops };
+  };
 
+  const cropOptions = ["Maize", "Wheat", "Rice", "Tomato", "Cassava", "Yam", "Pepper",
+    "Groundnut", "Sorghum", "Soybean", "Okra", "Spinach", "Cabbage", "Onion", "Garlic", "Other"];
+
+  const daysSince = (plantingDate) => {
+    if (!plantingDate) return null;
+    const days = (Date.now() - new Date(plantingDate)) / 86400000;
+    return Math.floor(days);
+  };
+
+  // Add new node
+  const addNewNode = () => {
+    if (!newNode.id || !newNode.crop) {
+      alert("coming soon");
+      return;
+    }
+    
+    // Add to custom crops
+    setCustomCrops(prev => ({
+      ...prev,
+      [newNode.id]: {
+        crop: newNode.crop,
+        planted: newNode.planted || new Date().toISOString().split('T')[0],
+        notes: newNode.notes || "Newly added node"
+      }
+    }));
+    
+    setShowAddNode(false);
+    setNewNode({ id: "", mac: "", crop: "", planted: "", notes: "" });
+  };
+
+  // Growth Analysis Component (display only)
+  const GrowthAnalysis = ({ node, cropData }) => {
+    const cropName = cropData.crop;
+    const plantingDate = cropData.planted;
+    const humidity = node.sensor_json?.humidity || 0;
+    const temp = node.sensor_json?.temp_c || 0;
+    
+    const analysis = analyzeCropGrowth(cropName, plantingDate, humidity, temp);
+    
+    if (!analysis) return null;
+    
+    return (
+      <div className="growth-stage-card">
+        <div className="stage-header">
+          <span className="stage-icon">{analysis.currentStage?.icon || "🌱"}</span>
+          <span className="stage-name">
+            {analysis.currentStage?.name || "Growing"} • {analysis.progressPercent}% complete
+          </span>
+        </div>
+        
+        <div className="progress-bar-container">
+          <div className="progress-bar-fill" style={{ width: `${analysis.progressPercent}%` }}></div>
+        </div>
+        
+        <div className="crop-metrics">
+          <div className="metric-chip">
+            📅 Age: {analysis.daysSincePlanting} days
+          </div>
+          <div className="metric-chip">
+            🚜 Matures in: {analysis.maturityDays} days
+          </div>
+          <div className="metric-chip">
+            🎯 Health: {analysis.health}
+          </div>
+          <div className="metric-chip">
+            🌡️ Soil: {temp}°C / {humidity}% RH
+          </div>
+        </div>
+        
+        {/* What you should be seeing */}
+        {analysis.expectedObservations.length > 0 && (
+          <>
+            <div style={{ fontSize: "11px", fontWeight: "700", marginTop: "8px", color: "var(--blue-dark)" }}>
+              🔍 What you should be seeing:
+            </div>
+            <ul className="observation-list">
+              {analysis.expectedObservations.map((obs, idx) => (
+                <li key={idx}>{obs}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        
+        {/* Environmental Recommendations */}
+        {analysis.envRecommendations.length > 0 && (
+          <div style={{ marginTop: "8px" }}>
+            <div style={{ fontSize: "11px", fontWeight: "700", marginBottom: "4px", color: "var(--green-dark)" }}>
+              💡 Environmental Recommendations:
+            </div>
+            {analysis.envRecommendations.map((rec, idx) => (
+              <div key={idx} className="recommendation-tag">{rec}</div>
+            ))}
+          </div>
+        )}
+        
+        {/* Stage-specific actions */}
+        {analysis.currentStage?.actions && (
+          <div style={{ marginTop: "8px" }}>
+            <div style={{ fontSize: "11px", fontWeight: "700", marginBottom: "4px", color: "var(--blue-dark)" }}>
+              ⚡ Recommended Actions:
+            </div>
+            {analysis.currentStage.actions.map((action, idx) => (
+              <div key={idx} className="recommendation-tag" style={{ background: "rgba(29,156,211,0.1)" }}>
+                {action}
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Harvest Countdown */}
+        <div className={`harvest-countdown ${analysis.daysUntilHarvest < 14 ? 'urgent' : ''}`}>
+          {analysis.daysUntilHarvest === 0 ? (
+            "🌾 Ready for harvest today!"
+          ) : analysis.isOverdue ? (
+            "⚠️ OVERDUE - Harvest immediately!"
+          ) : (
+            <>
+              <strong>⏰ {analysis.daysUntilHarvest} days until harvest</strong>
+              <div style={{ fontSize: "10px", marginTop: "4px" }}>
+                Expected: {analysis.harvestDate.toLocaleDateString()}
+              </div>
+            </>
+          )}
+        </div>
+        
+        {/* Next Stage Preview */}
+        {analysis.nextStage && (
+          <div style={{ fontSize: "10px", marginTop: "8px", color: "var(--muted)", textAlign: "center" }}>
+            Next: {analysis.nextStage.icon} {analysis.nextStage.name} in {analysis.nextStage.daysRange[0] - analysis.daysSincePlanting} days
+          </div>
+        )}
+      </div>
+    );
+  };
+  
+  // Get all crop data (prepopulated + custom)
+  const allCropData = getAllCropData();
+  
   return (
     <div>
-      <div className="section-heading">Crop Management</div>
-      <div className="section-desc">Record the crop and planting date for each sensor node</div>
+      <div className="section-heading">Crop Growth Monitor</div>
+      <div className="section-desc">
+        Real-time crop development tracking with AI-powered recommendations
+      </div>
+      
       <div className="crop-grid">
-        {nodes.map(n => {
-          const col = NODE_COLORS[n.node_id]||"#1a9c3e";
-          const d   = daysSince(crops[n.node_id]?.planted);
+        {/* Show prepopulated nodes */}
+        {nodes.map(node => {
+          const cropData = allCropData[node.node_id];
+          if (!cropData) return null;
+          
+          const col = NODE_COLORS[node.node_id] || "#1a9c3e";
+          const ageDays = daysSince(cropData.planted);
+          const plantingDateFormatted = new Date(cropData.planted).toLocaleDateString();
+          const isCustomNode = customCrops[node.node_id] !== undefined;
+          
           return (
-            <div key={n.node_id} className="crop-card">
-              <div className="crop-top-bar" style={{background:col}}/>
+            <div key={node.node_id} className="crop-card">
+              <div className="crop-top-bar" style={{ background: col }} />
+              
+              {/* Header with Node Info */}
               <div className="crop-card-header">
-                <span className="crop-node-label">{n.node_id}</span>
-                <span className={`node-badge ${n.active?"online":"offline"}`}>{n.active?"LIVE":"OFFLINE"}</span>
+                <div>
+                  <span className="crop-node-label">
+                    {node.node_id}
+                    {isCustomNode && (
+                      <span style={{ 
+                        marginLeft: "8px", 
+                        fontSize: "9px", 
+                        background: "var(--blue-pale)", 
+                        padding: "2px 6px", 
+                        borderRadius: "4px",
+                        color: "var(--blue-dark)"
+                      }}>
+                        CUSTOM
+                      </span>
+                    )}
+                  </span>
+                  <div style={{ fontSize: "10px", color: "var(--muted)", marginTop: "2px" }}>
+                    {cropData.notes}
+                  </div>
+                </div>
+                <span className={`node-badge ${node.active ? "online" : "offline"}`}>
+                  {node.active ? "ACTIVE" : "OFFLINE"}
+                </span>
               </div>
-              <div className="form-field">
-                <label className="form-label">Crop</label>
-                <select className="form-select" value={crops[n.node_id]?.crop||""} onChange={e=>update(n.node_id,"crop",e.target.value)}>
-                  <option value="">: Select crop :</option>
-                  {cropOptions.map(c=><option key={c} value={c}>{c}</option>)}
-                </select>
+              
+              {/* Current sensor readings */}
+              <div style={{ 
+                background: "var(--bg)", 
+                padding: "10px", 
+                borderRadius: "8px", 
+                marginBottom: "16px",
+                display: "flex",
+                justifyContent: "space-around",
+                textAlign: "center"
+              }}>
+                <div>
+                  <div style={{ fontSize: "10px", color: "var(--muted)" }}>Soil Moisture</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "var(--green)" }}>
+                    {node.sensor_json?.humidity?.toFixed(1)}%
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "10px", color: "var(--muted)" }}>Temperature</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "var(--blue)" }}>
+                    {node.sensor_json?.temp_c?.toFixed(1)}°C
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "10px", color: "var(--muted)" }}>EC</div>
+                  <div style={{ fontSize: "18px", fontWeight: "700", color: "var(--text)" }}>
+                    {node.sensor_json?.ec?.toFixed(2)}
+                  </div>
+                </div>
               </div>
-              <div className="form-field">
-                <label className="form-label">Planting Date</label>
-                <input type="date" className="form-input" value={crops[n.node_id]?.planted||""} onChange={e=>update(n.node_id,"planted",e.target.value)}/>
-                {d!==null && <div className="days-since">🌱 {d} days since planting</div>}
+              
+              {/* Crop Information Display */}
+              <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: "1fr 1fr", 
+                gap: "12px",
+                marginBottom: "16px",
+                padding: "12px",
+                background: "var(--green-pale)",
+                borderRadius: "8px"
+              }}>
+                <div>
+                  <div style={{ fontSize: "10px", color: "var(--muted)" }}>🌾 Crop</div>
+                  <div style={{ fontSize: "16px", fontWeight: "800", color: "var(--green-dark)" }}>
+                    {cropData.crop}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: "10px", color: "var(--muted)" }}>📅 Planted</div>
+                  <div style={{ fontSize: "13px", fontWeight: "600" }}>
+                    {plantingDateFormatted}
+                    <span style={{ fontSize: "11px", color: "var(--muted)", marginLeft: "6px" }}>
+                      ({ageDays} days ago)
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="form-field">
-                <label className="form-label">Notes</label>
-                <input type="text" className="form-input" placeholder="e.g. Row 3, east plot" value={crops[n.node_id]?.notes||""} onChange={e=>update(n.node_id,"notes",e.target.value)}/>
-              </div>
-              <button className="save-btn" style={{background:saved[n.node_id]?"var(--blue)":"var(--green)"}} onClick={()=>save(n.node_id)}>
-                {saved[n.node_id]?"✓ Saved":"Save"}
-              </button>
+              
+              {/* Growth Analysis */}
+              <GrowthAnalysis node={node} cropData={cropData} />
             </div>
           );
         })}
+      </div>
+      
+      {/* Field Summary Statistics */}
+      <div style={{ marginTop: "32px", padding: "24px", background: "var(--surface)", borderRadius: "12px", border: "1px solid var(--border)" }}>
+        <div style={{ fontWeight: "800", marginBottom: "20px", fontSize: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
+          📊 Field Summary Dashboard
+        </div>
+        
+        {(() => {
+          const activeNodes = nodes.filter(n => allCropData[n.node_id]);
+          const uniqueCrops = [...new Set(activeNodes.map(n => allCropData[n.node_id]?.crop))];
+          const totalArea = activeNodes.length * 0.5;
+          
+          // Calculate harvest stats
+          const harvestStats = activeNodes.map(node => {
+            const cropData = allCropData[node.node_id];
+            const analysis = analyzeCropGrowth(cropData.crop, cropData.planted, 0, 0);
+            return {
+              node: node.node_id,
+              daysToHarvest: analysis?.daysUntilHarvest || 0,
+              isOverdue: analysis?.isOverdue || false,
+              progress: analysis?.progressPercent || 0
+            };
+          });
+          
+          const nearHarvest = harvestStats.filter(h => h.daysToHarvest < 14 && h.daysToHarvest > 0).length;
+          const overdue = harvestStats.filter(h => h.isOverdue).length;
+          const avgProgress = harvestStats.length > 0 
+            ? Math.round(harvestStats.reduce((sum, h) => sum + h.progress, 0) / harvestStats.length)
+            : 0;
+          
+          return (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
+              <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>🌾 Active Crops:</span>
+                <strong style={{ fontSize: "14px" }}>{uniqueCrops.join(", ")}</strong>
+              </div>
+              <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>📡 Planted Nodes:</span>
+                <strong style={{ fontSize: "14px" }}>{activeNodes.length}</strong>
+              </div>
+              <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>📐 Total Area:</span>
+                <strong style={{ fontSize: "14px" }}>{totalArea.toFixed(1)} hectares</strong>
+              </div>
+              <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span>📈 Avg. Growth:</span>
+                <strong style={{ fontSize: "14px" }}>{avgProgress}% complete</strong>
+              </div>
+              {nearHarvest > 0 && (
+                <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--yellow-pale)" }}>
+                  <span>🚜 Near Harvest (14d):</span>
+                  <strong style={{ fontSize: "14px", color: "#9a7a00" }}>{nearHarvest} nodes</strong>
+                </div>
+              )}
+              {overdue > 0 && (
+                <div className="metric-chip" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--red-pale)" }}>
+                  <span>⚠️ Overdue Harvest:</span>
+                  <strong style={{ fontSize: "14px", color: "var(--red)" }}>{overdue} nodes</strong>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+      
+      {/* Quick Status Legend */}
+      <div style={{ 
+        marginTop: "20px", 
+        padding: "16px", 
+        background: "var(--bg)", 
+        borderRadius: "8px",
+        fontSize: "11px",
+        color: "var(--muted)",
+        textAlign: "center"
+      }}>
+        💡 Data is automatically updated from field sensors. Growth stages are calculated based on crop type, 
+        planting date, and real-time environmental conditions.
+      </div>
+      
+      {/* Add New Node Section */}
+      <div className="add-node-section">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+          <div>
+            <div style={{ fontWeight: "800", fontSize: "16px", color: "var(--green-dark)" }}>
+              ➕ Add New Sensor Node
+            </div>
+            <div style={{ fontSize: "12px", color: "var(--muted)", marginTop: "4px" }}>
+              Register a new node in the field and assign crop immediately
+            </div>
+          </div>
+          <button 
+            onClick={() => setShowAddNode(!showAddNode)}
+            style={{
+              background: "var(--green)",
+              color: "white",
+              border: "none",
+              padding: "8px 20px",
+              borderRadius: "8px",
+              fontWeight: "700",
+              cursor: "pointer"
+            }}
+          >
+            {showAddNode ? "− Cancel" : "+ Add Node"}
+          </button>
+        </div>
+        
+        {showAddNode && (
+          <div style={{ 
+            background: "white", 
+            padding: "20px", 
+            borderRadius: "12px",
+            marginTop: "16px"
+          }}>
+            <div style={{ display: "grid", gap: "16px", marginBottom: "20px" }}>
+              <div>
+                <label className="form-label">Node ID *</label>
+                <input 
+                  type="text" 
+                  className="form-input"
+                  placeholder="e.g., NODE_05"
+                  value={newNode.id}
+                  onChange={e => setNewNode({...newNode, id: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="form-label">MAC Address</label>
+                <input 
+                  type="text" 
+                  className="form-input"
+                  placeholder="xx:xx:xx:xx:xx:xx"
+                  value={newNode.mac}
+                  onChange={e => setNewNode({...newNode, mac: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="form-label">Initial Crop *</label>
+                <select 
+                  className="form-select"
+                  value={newNode.crop}
+                  onChange={e => setNewNode({...newNode, crop: e.target.value})}
+                >
+                  <option value="">Select crop</option>
+                  {cropOptions.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="form-label">Planting Date</label>
+                <input 
+                  type="date" 
+                  className="form-input"
+                  value={newNode.planted}
+                  onChange={e => setNewNode({...newNode, planted: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="form-label">Notes</label>
+                <input 
+                  type="text" 
+                  className="form-input"
+                  placeholder="Optional notes about location, variety, etc."
+                  value={newNode.notes}
+                  onChange={e => setNewNode({...newNode, notes: e.target.value})}
+                />
+              </div>
+            </div>
+            <button 
+              onClick={addNewNode}
+              style={{
+                width: "100%",
+                background: "var(--blue)",
+                color: "white",
+                border: "none",
+                padding: "10px",
+                borderRadius: "8px",
+                fontWeight: "700",
+                cursor: "pointer"
+              }}
+            >
+              Register Node & Add to Dashboard
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
