@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && echo '/* /index.html 200' > dist/_redirects",
+    "build": "vite build && cp public/_redirects dist/_redirects 2>/dev/null || echo '/* /index.html 200' > dist/_redirects",
     "lint": "eslint .",
     "preview": "vite preview"
   },
