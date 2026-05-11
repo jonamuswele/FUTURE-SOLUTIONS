@@ -1477,7 +1477,7 @@ export default function AdminApp() {
 
           <div className="sidebar-footer">
             <div className="admin-row">
-              <div className="admin-avatar">DA</div>
+              <div className="admin-avatar">FSL</div>
               <div>
                 <div className="admin-name">Future Solutions</div>
                 <div className="admin-role">Supervisor</div>
