@@ -26,7 +26,7 @@ const FARMS = [
       {node_id:"NODE_03",active:false,sensor_json:{temp_c:27.4,humidity:29,ec:3.1},uptime_s:8900, count:201},
     ],
     tips:[
-      {id:1,date:"2026-05-01",author:"Future Solutions",text:"Irrigate NODE_02 tomato plot — humidity dropped below 40% for 3 consecutive days.",type:"urgent"},
+      {id:1,date:"2026-05-01",author:"Future Solutions",text:"Irrigate NODE_02 tomato plot , humidity dropped below 40% for 3 consecutive days.",type:"urgent"},
       {id:2,date:"2026-04-28",author:"Field Team",text:"NODE_03 offline. Visit scheduled Friday.",type:"info"},
     ]
   },
@@ -99,7 +99,7 @@ const AGRO_TIPS = [
   "Maize requires at least 500mm water during the season — most during tasseling stage.",
   "Morning irrigation (5–8am) reduces evaporation losses by up to 30% vs midday watering.",
   "Soil temperature above 35°C significantly reduces germination rates for most vegetables.",
-  "Tomatoes prefer soil humidity 60–70% — below 50% causes blossom drop and yield loss.",
+  "Tomatoes prefer soil humidity 60–70% , below 50% causes blossom drop and yield loss.",
   "Cowpea is drought-tolerant — only irrigate when humidity drops below 35%.",
   "High EC with low humidity often indicates salt accumulation — common in dry season.",
 ];
@@ -883,7 +883,7 @@ function FarmDrawer({ farm, onClose }) {
                     <td className="mono">{c.node}</td>
                     <td className="strong">{c.crop}</td>
                     <td className="mono">{c.planted}</td>
-                    <td className="mono">{daysSince(c.planted)??"—"}d</td>
+                    <td className="mono">{daysSince(c.planted)??";"}d</td>
                     <td className="mono">{c.area_ha} ha</td>
                   </tr>
                 ))}
@@ -959,12 +959,12 @@ function FarmDrawer({ farm, onClose }) {
                       <td className="mono">{c.node}</td>
                       <td className="strong">{c.crop}</td>
                       <td className="mono">{c.planted}</td>
-                      <td className="mono">{d??"—"} days</td>
+                      <td className="mono">{d??";"} days</td>
                       <td className="mono">{c.area_ha} ha</td>
                       <td>
                         {rem!==null
                           ? <span className={`badge ${rem===0?"good":"info"}`}>{rem===0?"✓ Ready":rem+" days"}</span>
-                          : "—"}
+                          : ";"}
                       </td>
                     </tr>
                   );
@@ -1099,7 +1099,7 @@ function OverviewPage() {
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18,marginBottom:20}}>
         <div className="card">
-          <div className="card-title">Fleet Humidity — 24h</div>
+          <div className="card-title">Fleet Humidity 24h</div>
           <div className="card-sub">Average across all active farms</div>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={fleetTrend} margin={{top:5,right:5,left:-20,bottom:5}}>
@@ -1119,7 +1119,7 @@ function OverviewPage() {
         </div>
 
         <div className="card">
-          <div className="card-title">Alert Activity — 24h</div>
+          <div className="card-title">Alert Activity 24h</div>
           <div className="card-sub">Open alerts across all farms</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={fleetTrend} margin={{top:5,right:5,left:-20,bottom:5}}>
@@ -1202,7 +1202,7 @@ function FarmsPage() {
                 </span>
               </div>
               <div className="alert-num" style={{color:f.alerts>0?"var(--red)":"var(--muted)"}}>
-                {f.alerts>0?`⚠ ${f.alerts}`:"—"}
+                {f.alerts>0?`⚠ ${f.alerts}`:":"}
               </div>
               <div><span className={`badge ${f.status}`}>{f.status}</span></div>
               <div style={{fontSize:11,color:"var(--muted)"}}>{f.joined}</div>
@@ -1272,7 +1272,7 @@ function AnalyticsPage() {
         </div>
 
         <div className="card">
-          <div className="card-title">Platform Growth — 12 Months</div>
+          <div className="card-title">Platform Growth 12 Months</div>
           <div className="card-sub">Farms onboarded and alert trend over time</div>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={growth} margin={{top:5,right:5,left:-20,bottom:5}}>
@@ -1392,9 +1392,9 @@ function AlertsPage() {
       const ec=n.sensor_json?.ec||0;
       const type=!n.active?"info":hum<25?"danger":ec>3.5?"warning":"warning";
       const msg=!n.active?`${n.node_id} on ${f.name}'s farm is offline`
-        :hum<25?`Critical moisture at ${n.node_id} — ${f.name}'s farm (${hum.toFixed(1)}%)`
-        :ec>3.5?`High EC at ${n.node_id} — ${f.name}'s farm (${ec.toFixed(2)} mS/cm)`
-        :`Low humidity at ${n.node_id} — ${f.name}'s farm (${hum.toFixed(1)}%)`;
+        :hum<25?`Critical moisture at ${n.node_id} : ${f.name}'s farm (${hum.toFixed(1)}%)`
+        :ec>3.5?`High EC at ${n.node_id} : ${f.name}'s farm (${ec.toFixed(2)} mS/cm)`
+        :`Low humidity at ${n.node_id} : ${f.name}'s farm (${hum.toFixed(1)}%)`;
       return {key:`${f.id}-${n.node_id}`,type,msg,farm:f,node:n};
     })
   );
@@ -1518,7 +1518,7 @@ export default function AdminApp() {
             padding:"14px 28px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:10,fontSize:12,color:"var(--muted)",fontWeight:600}}>
               <div style={{width:6,height:6,borderRadius:"50%",background:"var(--green)"}}/>
-              © 2026 Future Solutions Ltd — Operations Platform
+              © 2026 Future Solutions Ltd : Operations Platform
             </div>
             <div style={{fontSize:11,color:"var(--muted)"}}>
               {FARMS.filter(f=>f.status==="active").length} active farms · {FARMS.reduce((a,f)=>a+f.nodes.filter(n=>n.active).length,0)} live sensors
